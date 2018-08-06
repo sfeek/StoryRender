@@ -1,0 +1,49 @@
+:start
+It is a bright and sunny day outside and you are considering walking to the store for groceries. As you eat your morning cereal you notice that the neighbor is mowing his grass. Even though you are almost out of milk, you consider staying inside because you are very alergic to the freshly cut grass. As you ponder your choices...
+
+?Go outside and rush past your neighbor holding your breath:rush_outside
+?Go back to bed after eating your cereal:back_to_bed
+?Continue contemplating your need to go to the store:continue_contemplating
+
+:rush_outside
+You put on your shoes and glance outside waiting for your neighbor to get to the end of his lawn furthest from you. You then make a mad dash down the sidewalk holding your breath. After a hundred yards or so you start to feel dizzy from the lack of oxygen. Maybe you should?
+
+?Sit down:sit_down
+?Keep running because you are almost past the alergen:keep_running
+
+:keep_running
+Your heart is pounding and you are blacking out. You fall face down on the cement and it is game over!
+#end
+
+:sit_down
+You sat down just in time to avoid completely passing out. You have decided that maybe you should go back home and begin slowly meandering that way. Once you pass through the door you head strait to bed since you almost passed out.
+#back_to_bed2
+
+:back_to_bed1
+You finish up your cereal and decide that it just isn't worth it and go back to bed. 
+:back_to_bed2
+Your day is now wasted, but hey, at least you are not miserable from sneezing and coughing.
+#end
+
+:continue_contemplating
+You are a serious procrastinator and you do not like alergies either. Maybe you should
+?Stay inside and think some more?:stay_inside
+?Rush outside anyways after all you are a tough man!:rush_outside
+
+:stay_inside
+Since you have decided to stay inside, maybe you should find something contructive to do. Or maybe going back to bed would be a good idea.
+?Do something constructive:constructive
+?Go back to bed:back_to_bed1
+
+:constructive
+You have decided to do something contructive, so you dish two loads of dishes and now you are tired. You have decided to go back to bed.
+#back_to_bed2
+
+:end
+Would you like to start over?
+?yes:start
+?no:leave
+
+:leave
+
+Story over!
