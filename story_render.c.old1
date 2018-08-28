@@ -53,19 +53,14 @@ int main(int argc, char *argv[])
 	char *line = NULL;
 	size_t len = 0;
 	size_t read;
-	int w,i,l,x,q,nextspace,token_flag,input;
+	int w,i,l,x,q,tc,nextspace,token_flag,input;
 	FILE *fp;
-
-	/* Start with NULL buffers */
-	for(l=0;l<MAX_LINES;l++) lines[l]=NULL;
-	for(l=0;l<MAX_TOKENS;l++) t[l]=NULL;
-	for(l=0;l<MAX_QUESTIONS;l++) labels[l]=NULL;
 	
-	if (argc != 2) return 0; /* Make sure we have the right number of arguments */
+	if (argc != 2) return 1; /* Make sure we have the right number of arguments */
 
 	/* Open the file */
 	fp = fopen(argv[1],"r");
-	if (fp == NULL) return 0; /* Make sure that file was opened properly */
+	if (fp == NULL) return 1; /* Make sure that file was opened properly */
 
 	/* Read in all the lines */
 	for(i = 0;i < MAX_LINES; i++)
@@ -77,12 +72,14 @@ int main(int argc, char *argv[])
 
 		if (strlen(line) < 1) strcpy(line," "); /* Make a single space for empty lines */
 
+		lines[i] = NULL;
 		if (safe_copy(&lines[i],line)) /* Keep the good lines */
 		{
+			for(w=0;w<i;w++) free(lines[w]); /* Free all previous lines memory */
 			printf("String copy error occurred!\n");
-			goto exit_abort;
+			return 1;
 		}
-		
+
 		nextspace = 0;
 		l = strlen(lines[i]);
 		for(w=1;w<l;w++) /* Make nice Line Wraps to 80 columns-ish */
@@ -99,6 +96,9 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	fclose(fp); /* Close the file */
+	free(line); /* Free the line buffer */
+
 	/* Process the story */
 	x=0;
 	while(x<i)
@@ -111,8 +111,9 @@ int main(int argc, char *argv[])
 			
 			if (x<0)
 			{
-				printf("\nStory Logic Error, missing label!\n");
-				goto exit_abort;
+				for(x=0;x<i;x++) free(lines[x]); /* Free the lines*/	
+				printf("\nStory Logic Error, could not find label!\n");
+				return 1;
 			}
 			continue;
 		}
@@ -124,35 +125,41 @@ int main(int argc, char *argv[])
 			{
 				if (x==i-1) /* Did we hit the end of the file?*/
 				{
+					for(w=0;w<i;w++) free(lines[w]);/* Free up the lines*/	
+					for(l=1;l<=q;l++) free(labels[l]); /* Free the labels */
 					printf("\nStory Logic Error, missing questions!\n"); 
-					goto exit_abort; 				
+					return 1; 				
 				}
 
 				if (lines[x][0] == '?') /* Look for more questions */
 				{
+					q++;
 					
 					if (q >= MAX_QUESTIONS) /* Don't exceed maximum number of questions */
 					{
+						for(x=0;x<i;x++) free(lines[x]);/* Free up the lines*/	
+						for(l=1;l<q;l++) free(labels[l]); /* Free the labels */
 						printf("\nStory Logic Error, too many questions!\n"); 
-						goto exit_abort; 
+						return 1; 
 					}
 
 					token_flag = tokenize(t,lines[x]+1,MAX_TOKENS,":"); /* Separate question and label */
 
 					if (token_flag == 2) /* Successfully tokenized */
 					{
-						if (q==0) printf("\n"); /* Blank line before first answer */
-						printf("%d. %s\n",q+1,t[0]); /* Show the questions */
+						printf("%d. %s\n",q,t[0]); /* Show the questions */
 						
+						labels[q]=NULL;
 						safe_copy(&labels[q],t[1]); /* Keep the label */
-						for(l=0;l<token_flag;l++) {free(t[l]); t[l]=NULL;} /* Free the tokens */
+						for(tc=0;tc<token_flag;tc++) free(t[tc]); /* Free the tokens */
 					}
 					else
 					{
+						for(tc=0;tc<token_flag;tc++) free(t[tc]); /* Free the tokens */
+						for(x=0;x<i;x++) free(lines[x]); /* Free the lines*/	
 						printf("\nStory Logic Error, missing label!\n");
-						goto exit_abort;
+						return 1;
 					}
-					q++; /* Next question */
 				}
 				x++; /* Next line */
 			}
@@ -160,17 +167,19 @@ int main(int argc, char *argv[])
 			input = 0;
 			while (input<1 || input>q) input = getint(""); /* Get the answer */
 						
-			x = search_label(lines,i,labels[input-1]); /* Search for the label, set x to next line */
+			x = search_label(lines,i,labels[input]); /* Search for the label, set x to next line */
 			
 			if (x<0)
 			{
-				printf("\nStory Logic Error, missing label!\n");
-				goto exit_abort;
+				for(x=0;x<i;x++) free(lines[x]); /* Free the lines*/	
+				for(l=1;l<=q;l++) free(labels[l]); /* Free the labels */
+				printf("\nStor Logic Error, could not find label!\n");
+				return 1;
 			}
 
 			printf("\n\n"); /* Give some space! */
 
-			for(l=0;l<q;l++) {free(labels[l]); labels[l]=NULL;} /* Free the labels */
+			for(l=1;l<=q;l++) free(labels[l]); /* Free the labels */
 		}
 		else /* If not a question, send text to the screen */
 		{
@@ -179,16 +188,7 @@ int main(int argc, char *argv[])
 		}
 	}	 
 	
+	for(x=0;x<i;x++) free(lines[x]); /* Free the lines*/	
 	
-	exit_abort: 
-
-	/* Clean up all dynamically allocated memory */	
-	for(l=0;lines[l];l++) {free(lines[l]); lines[l]=NULL;}
-	for(l=0;labels[l];l++) {free(labels[l]); labels[l]=NULL;}
-	for(l=0;t[l];l++) {free(t[l]); t[l]=NULL;}
-	free(line); line=NULL;
-
-	if (fp) fclose(fp); /* Close the file */
-
-	return 0;
+	return 0; /* Beavis has left the building! */
 }
