@@ -8,6 +8,15 @@
 #define MAX_TOKENS 2
 #define MAX_QUESTIONS 50
 
+#define KNRM  "\x1B[0m"
+#define KRED  "\x1B[31m"
+#define KGRN  "\x1B[32m"
+#define KYEL  "\x1B[33m"
+#define KBLU  "\x1B[34m"
+#define KMAG  "\x1B[35m"
+#define KCYN  "\x1B[36m"
+#define KWHT  "\x1B[37m"
+
 /* Strip CRLF */
 void strip_newline(char *s)
 {
@@ -142,7 +151,7 @@ int main(int argc, char *argv[])
 					if (token_flag == 2) /* Successfully tokenized */
 					{
 						if (q==0) printf("\n"); /* Blank line before first answer */
-						printf("%d. %s\n",q+1,t[0]); /* Show the questions */
+						printf("%s%d. %s%s%s\n",KYEL,q+1,KCYN,t[0],KNRM); /* Show the questions */
 						
 						safe_copy(&labels[q],t[1]); /* Keep the label */
 						for(l=0;l<token_flag;l++) {free(t[l]); t[l]=NULL;} /* Free the tokens */
@@ -174,7 +183,7 @@ int main(int argc, char *argv[])
 		}
 		else /* If not a question, send text to the screen */
 		{
-			printf("%s\n",lines[x]);
+			printf("%s%s%s\n",KGRN,lines[x],KNRM);
 			x++;
 		}
 	}	 
