@@ -7,5 +7,5 @@
 #define NULL_BUFFER -3
 #define OK 0
 
-int tokenize(char *[], char *, int, char *);
+int tokenize (char *[], char *, int, char *);
 
